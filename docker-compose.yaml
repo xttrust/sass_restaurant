@@ -33,12 +33,15 @@ services:
     ports:
       - "3310:3306"
     environment:
-      - MYSQL_ROOT_PASSWORD=securerootpassword
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${DB_DATABASE}
+      - MYSQL_USER=${DB_USERNAME}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
     volumes:
-      - ./mysql-init:/docker-entrypoint-initdb.d
       - ./mysql-data:/var/lib/mysql
     networks:
       - backend
+
 
   sr_nginx:
     image: nginx:latest
@@ -49,7 +52,6 @@ services:
       - ./:/var/www/html
     ports:
       - "8080:80"
-      - "4433:443"
     networks:
       - backend
 

@@ -39,8 +39,4 @@ RUN mkdir -p /home/$user/.composer && \
 
 WORKDIR /var/www/html
 
-# Copy the initialization script and make it executable
-COPY mysql-init/dump.sh /docker-entrypoint-initdb.d/dump.sh
-RUN chmod +x /docker-entrypoint-initdb.d/dump.sh
-
 USER $user
