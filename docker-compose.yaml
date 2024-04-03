@@ -1,0 +1,61 @@
+version: '3.7'
+
+volumes:
+  mysql-data:
+
+services:
+  sr_app:
+    environment:
+      PHP_OPCACHE_VALIDATE_TIMESTAMPS: 1
+    build:
+      args:
+        user: sr_admin
+        uid: 501
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    tty: true
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    ports:
+      - "9000:9000"
+    networks:
+      - backend
+
+  sr_mysql:
+    image: mysql:8.0.26
+    command: --default-authentication-plugin=mysql_native_password --innodb-use-native-aio=0 --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --max-connections=500
+    restart: unless-stopped
+    tty: true
+    expose:
+      - '3310'
+    ports:
+      - "3310:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${DB_DATABASE}
+      - MYSQL_USER=${DB_USERNAME}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - ./mysql-data:/var/lib/mysql
+    networks:
+      - backend
+
+
+  sr_nginx:
+    image: nginx:latest
+    restart: unless-stopped
+    tty: true
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+      - ./:/var/www/html
+    ports:
+      - "8080:80"
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
+
